@@ -1,5 +1,0 @@
-streamlit
-youtube-transcript-api
-transformers
-textblob
-nltk
