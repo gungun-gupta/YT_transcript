@@ -9,12 +9,12 @@ import nltk
 import re
 
 # Download necessary NLTK data
-nltk.download('punkt', quiet=True)
-nltk.download('stopwords', quiet=True)
-nltk.download('wordnet', quiet=True)
+nltk.download("punkt", quiet=True)
+nltk.download("stopwords", quiet=True)
+nltk.download("wordnet", quiet=True)
 
-# Summarization pipeline
-summarization_pipeline = pipeline("summarization", model="facebook/bart-large-cnn")
+# Summarization pipeline using a lighter model
+summarization_pipeline = pipeline("summarization", model="t5-small")
 
 # Helper functions
 def extract_video_id(url):
@@ -30,9 +30,11 @@ def extract_video_id(url):
             return match.group(1)
     return None
 
-def summarize_text(text, max_length=500):
-    """Summarize text using a pre-trained model."""
-    summary = summarization_pipeline(text, max_length=max_length, min_length=50, do_sample=False)
+def summarize_text(text, max_length=200):
+    """Summarize text using a smaller pre-trained model."""
+    if len(text) > 512:
+        text = text[:512]  # Truncate text to avoid exceeding model limits
+    summary = summarization_pipeline(text, max_length=max_length, min_length=30, do_sample=False)
     return summary[0]["summary_text"]
 
 def extract_keywords(text):
@@ -56,7 +58,7 @@ def main():
     video_url = st.text_input("Enter YouTube Video URL:", "")
 
     # User customization options
-    max_summary_length = st.slider("Max Summary Length (in characters):", 100, 1000, 500)
+    max_summary_length = st.slider("Max Summary Length (in characters):", 100, 1000, 200)
 
     if st.button("Summarize"):
         try:
